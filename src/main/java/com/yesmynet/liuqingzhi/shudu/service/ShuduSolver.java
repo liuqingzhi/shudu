@@ -42,7 +42,11 @@ public class ShuduSolver {
 				{
 					List<List<Integer>> combinations = combinations(toTryDigits);
 					List<Node<Shudu>> generateChildren = generateChildren(combinations,easiestTry,currentDatas);
-					currentDatas.setChildren(generateChildren);
+					if(currentDatas.getChildren() == null )
+					{
+						currentDatas.setChildren(new ArrayList<Node<Shudu>>());
+					}
+					currentDatas.getChildren().addAll(generateChildren);
 					if(generateChildren!=null && !generateChildren.isEmpty())
 					{
 						for(Node<Shudu> childNode:generateChildren)
