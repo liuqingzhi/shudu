@@ -5,6 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.yesmynet.liuqingzhi.shudu.dto.Node;
 import com.yesmynet.liuqingzhi.shudu.dto.Shudu;
 import com.yesmynet.liuqingzhi.shudu.dto.Shudu.Position;
@@ -22,7 +26,14 @@ public class ShuduPrint {
 	public void print(Node<Shudu> datas)
 	{
 		String printInternal = printInternal(datas);
+		printInternal=printJson(datas);
 		System.out.println(printInternal);
+	}
+	private String printJson(Node<Shudu> datas)
+	{
+		Gson gson=new GsonBuilder().setPrettyPrinting().serializeNulls().create();
+		String json = gson.toJson(datas);
+		return json;
 	}
 	/**
 	 * 打印出数独的推导过程
@@ -63,16 +74,19 @@ public class ShuduPrint {
 	 */
 	private void settingNodePosition(Node<Shudu> datas)
 	{
-		//Map<Integer,Integer> levelNodeNumMap=new HashMap<Integer,Integer>();
-		//datas.setPosition(new Position(0,0));
-		int i=0;
-		for(Node<Shudu> child:datas.getChildren())
+		List<Node<Shudu>> children = datas.getChildren();
+		if(children!=null && !children.isEmpty())
 		{
-			Position position = datas.getPosition();
-			child.setPosition(new Position(position.getX()+1,i));
-			settingNodePosition(child);
-			i++;
+			int i=0;
+			for(Node<Shudu> child:datas.getChildren())
+			{
+				Position position = datas.getPosition();
+				child.setPosition(new Position(position.getX()+1,i));
+				settingNodePosition(child);
+				i++;
+			}
 		}
+		
 	}
 	/**
 	 * 得到树的每一级深度和该深度对应的所有节点。
@@ -83,11 +97,16 @@ public class ShuduPrint {
 	{
 		Map<Integer,List<Node<Shudu>>> re=new HashMap<Integer,List<Node<Shudu>>>();
 		addNodeToMap(re,datas.getPosition().getX(),datas);
-		for(Node<Shudu> child:datas.getChildren())
+		List<Node<Shudu>> children = datas.getChildren();
+		if(CollectionUtils.isNotEmpty(children))
 		{
-			Map<Integer, List<Node<Shudu>>> childLevelNodeMap = getLevelNodeMap(child);
-			addNodeToMap(re,childLevelNodeMap);
+			for(Node<Shudu> child:children)
+			{
+				Map<Integer, List<Node<Shudu>>> childLevelNodeMap = getLevelNodeMap(child);
+				addNodeToMap(re,childLevelNodeMap);
+			}
 		}
+		
 		return re;
 	}
 	private void addNodeToMap(Map<Integer,List<Node<Shudu>>> map,Integer level,Node<Shudu> node)

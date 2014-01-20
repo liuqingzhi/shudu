@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.yesmynet.liuqingzhi.shudu.dto.InfoDto;
 import com.yesmynet.liuqingzhi.shudu.dto.Node;
 import com.yesmynet.liuqingzhi.shudu.dto.Shudu;
@@ -17,7 +19,7 @@ import com.yesmynet.liuqingzhi.shudu.dto.Shudu.GroupDigitType;
 import com.yesmynet.liuqingzhi.shudu.dto.Shudu.Position;
 
 public class ShuduSolver {
-
+	private Gson gson=new GsonBuilder().setPrettyPrinting().serializeNulls().create();
 	public void solve(Node<Shudu> datas)
 	{
 		solveInternal(datas);
@@ -108,7 +110,7 @@ public class ShuduSolver {
 			child.setParent(currentDatas);
 			
 			if(dataArray.size()!=emptyDigitPosition.size())
-				throw new RuntimeException("排列组合产生的数字个数和要填充的数字的位置个数不一样多");
+				throw new RuntimeException("排列组合产生的数字个数("+ dataArray.size() +")和要填充的数字的位置个数("+ emptyDigitPosition.size() +")不一样多");
 			for(int i=0;i<emptyDigitPosition.size();i++)
 			{
 				Position p = emptyDigitPosition.get(i);
@@ -251,12 +253,16 @@ public class ShuduSolver {
 				public int compare(ShuduTry o1, ShuduTry o2) {
 					return o1.getEmptyNum()-o2.getEmptyNum();
 				}});
-			Integer emptyNum=null;
+			Integer emptyNum=hasEmptyGroups.get(0).getEmptyNum();
 			for(ShuduTry shuduTry:hasEmptyGroups)
 			{
-				if(emptyNum==null || emptyNum<=shuduTry.getEmptyNum())
+				if(emptyNum>=shuduTry.getEmptyNum())
 				{
-					re.add(hasEmptyGroups.get(0));		
+					re.add(shuduTry);		
+				}
+				else
+				{
+					break;
 				}
 			}
 		}
