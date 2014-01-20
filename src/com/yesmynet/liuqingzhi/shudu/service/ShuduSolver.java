@@ -23,98 +23,6 @@ public class ShuduSolver {
 		solveInternal(datas);
 	}
 	/**
-	 * 打印出数独的推导过程
-	 * @param datas
-	 * @return
-	 */
-	protected String printAnswer(Node<Shudu> datas)
-	{
-		StringBuilder sb=new StringBuilder();
-		datas.setPosition(new Position(0,0));
-		settingNodePosition(datas);
-		Map<Integer, List<Node<Shudu>>> levelNodeMap = getLevelNodeMap(datas);
-		List<Node<Shudu>> deepestLevelNodes = getDeepestLevelNodes(levelNodeMap);
-		
-		
-		return sb.toString();
-	}
-	
-	/**
-	 * 得到树的最深一级的所有节点
-	 * @param levelNodeMap 以层级为key,该层级的所有节点为value的Map
-	 * @return
-	 */
-	private List<Node<Shudu>> getDeepestLevelNodes(Map<Integer, List<Node<Shudu>>> levelNodeMap)
-	{
-		Integer maxLevel=0;
-		for(Map.Entry<Integer,List<Node<Shudu>>> entry:levelNodeMap.entrySet())
-		{
-			Integer key = entry.getKey();
-			if(key>maxLevel)
-				maxLevel=key;
-		}
-		return levelNodeMap.get(maxLevel);
-	}
-	/**
-	 * 得到树的每一级深度和该深度对应的所有节点。
-	 * @param datas
-	 * @return
-	 */
-	private Map<Integer,List<Node<Shudu>>> getLevelNodeMap(Node<Shudu> datas)
-	{
-		Map<Integer,List<Node<Shudu>>> re=new HashMap<Integer,List<Node<Shudu>>>();
-		addNodeToMap(re,datas.getPosition().getX(),datas);
-		for(Node<Shudu> child:datas.getChildren())
-		{
-			Map<Integer, List<Node<Shudu>>> childLevelNodeMap = getLevelNodeMap(child);
-			addNodeToMap(re,childLevelNodeMap);
-		}
-		return re;
-	}
-	private void addNodeToMap(Map<Integer,List<Node<Shudu>>> map,Integer level,Node<Shudu> node)
-	{
-		List<Node<Shudu>> list = map.get(level);
-		if(list==null)
-		{
-			list=new ArrayList<Node<Shudu>>();
-			map.put(level, list);
-		}
-		list.add(node);
-	}
-	private void addNodeToMap(Map<Integer,List<Node<Shudu>>> mapMain,Map<Integer,List<Node<Shudu>>> mapIncrease)
-	{
-		for(Map.Entry<Integer,List<Node<Shudu>>> entry:mapIncrease.entrySet())
-		{
-			Integer key = entry.getKey();
-			List<Node<Shudu>> list = mapMain.get(key);
-			if(list==null)
-			{
-				list=new ArrayList<Node<Shudu>>();
-				mapMain.put(key, list);
-			}
-			
-			list.addAll(entry.getValue());
-		}
-	}
-	/**
-	 * 设置节点的位置，方便打印。
-	 * 在这里只是表示一个节点是第几行第几列（树的根结点是第0行，第0列）。
-	 * @param datas
-	 */
-	private void settingNodePosition(Node<Shudu> datas)
-	{
-		//Map<Integer,Integer> levelNodeNumMap=new HashMap<Integer,Integer>();
-		//datas.setPosition(new Position(0,0));
-		int i=0;
-		for(Node<Shudu> child:datas.getChildren())
-		{
-			Position position = datas.getPosition();
-			child.setPosition(new Position(position.getX()+1,i));
-			settingNodePosition(child);
-			i++;
-		}
-	}
-	/**
 	 * 计算出数独的解答
 	 * @param currentDatas
 	 */
@@ -123,29 +31,33 @@ public class ShuduSolver {
 		Shudu data = currentDatas.getData();
 		if(data.isHasEmpty())
 		{
-			ShuduTry easiestTry = getEasiestTry(data);
-			List<Integer> toTryDigits = getToTryDigits(easiestTry,data);
-			if(toTryDigits!=null && !toTryDigits.isEmpty())
+			List<ShuduTry> easiestTry2 = getEasiestTry(data);
+			for(ShuduTry easiestTry:easiestTry2)
 			{
-				List<List<Integer>> combinations = combinations(toTryDigits);
-				List<Node<Shudu>> generateChildren = generateChildren(combinations,easiestTry,currentDatas);
-				currentDatas.setChildren(generateChildren);
-				if(generateChildren!=null && !generateChildren.isEmpty())
+				//ShuduTry easiestTry = getEasiestTry(data);
+				List<Integer> toTryDigits = getToTryDigits(easiestTry,data);
+				if(toTryDigits!=null && !toTryDigits.isEmpty())
 				{
-					for(Node<Shudu> childNode:generateChildren)
+					List<List<Integer>> combinations = combinations(toTryDigits);
+					List<Node<Shudu>> generateChildren = generateChildren(combinations,easiestTry,currentDatas);
+					currentDatas.setChildren(generateChildren);
+					if(generateChildren!=null && !generateChildren.isEmpty())
 					{
-						InfoDto validNewTry = validNewTry(childNode,easiestTry);
-						if(validNewTry!=null && validNewTry.getSuccess()!=null && validNewTry.getSuccess()==false)
+						for(Node<Shudu> childNode:generateChildren)
 						{
-							//这一次尝试违反了规则
-							childNode.setResult(validNewTry);
-						}
-						else
-						{
-							solveInternal(childNode);
+							InfoDto validNewTry = validNewTry(childNode,easiestTry);
+							if(validNewTry!=null && validNewTry.getSuccess()!=null && validNewTry.getSuccess()==false)
+							{
+								//这一次尝试违反了规则
+								childNode.setResult(validNewTry);
+							}
+							else
+							{
+								solveInternal(childNode);
+							}
 						}
 					}
-				}
+				}	
 			}
 		}
 		else
@@ -293,7 +205,6 @@ public class ShuduSolver {
 			return num * factorial(num-1);
 		}
 	}
-	
 	/**
 	 * 得到要尝试的数字，也就是原数据中缺失的所有数字
 	 * @param shuduTry
@@ -326,9 +237,9 @@ public class ShuduSolver {
 	 * @param data
 	 * @return
 	 */
-	private ShuduTry getEasiestTry(Shudu data)
+	private List<ShuduTry> getEasiestTry(Shudu data)
 	{
-		ShuduTry re=null;
+		List<ShuduTry> re=new ArrayList<ShuduTry>();
 		List<ShuduTry> hasEmptyGroups = new ArrayList<ShuduTry>(); 
 		hasEmptyGroups.addAll(getHasEmptyGroups(data,GroupDigitType.Row));
 		hasEmptyGroups.addAll(getHasEmptyGroups(data,GroupDigitType.Column));
@@ -340,7 +251,14 @@ public class ShuduSolver {
 				public int compare(ShuduTry o1, ShuduTry o2) {
 					return o1.getEmptyNum()-o2.getEmptyNum();
 				}});
-			re=hasEmptyGroups.get(0);
+			Integer emptyNum=null;
+			for(ShuduTry shuduTry:hasEmptyGroups)
+			{
+				if(emptyNum==null || emptyNum<=shuduTry.getEmptyNum())
+				{
+					re.add(hasEmptyGroups.get(0));		
+				}
+			}
 		}
 		
 		return re;
