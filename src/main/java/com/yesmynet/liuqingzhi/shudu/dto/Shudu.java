@@ -60,6 +60,14 @@ public class Shudu {
 		public String toString() {
 			return "("+x+","+y+")";
 		}
+		@Override
+		public boolean equals(Object obj) {
+			if(obj!=null && obj instanceof Position)
+			{
+				return this.toString().endsWith(obj.toString());
+			}
+			return super.equals(obj);
+		}
 		
 	}
 	/**
@@ -94,7 +102,11 @@ public class Shudu {
 	private final Integer sideLength=3;
 	private final Integer[][] datas;
 	private final int sideDigitNum=9;
-	
+	/**
+	 * 本次设设置了数字的坐标。
+	 * 就是当按照上一步的条件推导出新的数字后，新填写的数字的坐标
+	 */
+	private List<Position> tryedPosition;
 	public Shudu() {
 		super();
 		datas=new Integer[sideDigitNum][sideDigitNum];
@@ -125,6 +137,24 @@ public class Shudu {
 			datas[x][y]=data;
 		}
 		return this;
+	}
+	/**
+	 * 得到指定坐标的值
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public Integer getData(int x,int y)
+	{
+		if(x<sideDigitNum && y<sideDigitNum)
+		{
+			return datas[x][y];
+		}
+		else
+		{	
+			throw new RuntimeException("坐标值超出范围,x="+x+",y="+y);
+		}
+			
 	}
 	/**
 	 * 是否有空的格子
@@ -224,6 +254,12 @@ public class Shudu {
 	}
 	public int getSideDigitNum() {
 		return sideDigitNum;
+	}
+	public List<Position> getTryedPosition() {
+		return tryedPosition;
+	}
+	public void setTryedPosition(List<Position> tryedPosition) {
+		this.tryedPosition = tryedPosition;
 	}
 	private List<DigitPosition> getRow(int y)
 	{

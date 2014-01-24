@@ -20,6 +20,7 @@ import com.yesmynet.liuqingzhi.shudu.dto.Shudu.Position;
 
 public class ShuduSolver {
 	private Gson gson=new GsonBuilder().setPrettyPrinting().serializeNulls().create();
+	private ShuduPrint shuduPrint=new ShuduPrint();
 	public void solve(Node<Shudu> datas)
 	{
 		solveInternal(datas);
@@ -47,6 +48,8 @@ public class ShuduSolver {
 						currentDatas.setChildren(new ArrayList<Node<Shudu>>());
 					}
 					currentDatas.getChildren().addAll(generateChildren);
+					shuduPrint.print(currentDatas);
+					
 					if(generateChildren!=null && !generateChildren.isEmpty())
 					{
 						for(Node<Shudu> childNode:generateChildren)
@@ -122,6 +125,8 @@ public class ShuduSolver {
 				
 				cloneShudu.setData(p.getX(), p.getY(), integer);
 			}
+			cloneShudu.setTryedPosition(emptyDigitPosition);
+			
 			children.add(child);
 			
 		}

@@ -9,11 +9,6 @@ public class Node<T> {
 	private Node<T> parent;
 	private List<Node<T>> children;
 	private InfoDto result;
-	/**
-	 * 为了方便打印结果增加的属性，表示当前的节点是第几行，第几列，
-	 * 
-	 */
-	private Position position;
 	public T getData() {
 		return data;
 	}
@@ -37,11 +32,5 @@ public class Node<T> {
 	}
 	public void setResult(InfoDto result) {
 		this.result = result;
-	}
-	public Position getPosition() {
-		return position;
-	}
-	public void setPosition(Position position) {
-		this.position = position;
 	}
 }

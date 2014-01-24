@@ -19,119 +19,127 @@ import com.yesmynet.liuqingzhi.shudu.dto.Shudu.Position;
  *
  */
 public class ShuduPrint {
+	private int childCount=1; 
 	/**
 	 * 打印
 	 * @param datas
 	 */
 	public void print(Node<Shudu> datas)
 	{
-		String printInternal = printInternal(datas);
-		printInternal=printJson(datas);
+		String printInternal = "";
+		//printInternal=printInternal(datas);
+		//printInternal=printJson(datas);
+		printInternal=printNodesTree(datas);
 		System.out.println(printInternal);
+	}
+	/**
+	 * 在html中以树的形式显示结点
+	 * @param datas
+	 * @return
+	 */
+	private String printNodesTree(Node<Shudu> datas)
+	{
+		StringBuilder sb=new StringBuilder();
+		List<Node<Shudu>> children = datas.getChildren();
+		boolean hasChild=CollectionUtils.isNotEmpty(children);
+		int childCountI=childCount++;
+		String shuduDataTable = getShuduDataTable(datas);
+		sb.append("{\n");
+		sb.append("'id': 'node").append(childCountI++).append("',\n");
+		sb.append("'name': 'nodeName").append(childCountI).append("',\n");
+		sb.append("'data': ").append(shuduDataTable);
+		if(hasChild)
+		{	
+			sb.append(",");
+		}
+		sb.append("\n");
+		if(hasChild)
+		{	
+			sb.append("'children': [\n");
+			for(Node child:children)
+			{
+				sb.append(printNodesTree(child));
+			}
+			sb.append("]\n");
+		}	
+		sb.append("}");
+		
+		return sb.toString();
+	}
+	/**
+	 * 打印出所有数字
+	 * @param datas
+	 * @return
+	 */
+	private String getShuduDataTable(Node<Shudu> datas)
+	{
+		StringBuilder sb=new StringBuilder();
+		Shudu data = datas.getData();
+		List<Position> tryedPosition = data.getTryedPosition();
+		sb.append("{");
+		sb.append("'shuduData':[\n");
+		for(int i=0;i<data.getSideDigitNum();i++)
+		{
+			sb.append("\t\t[");
+			for(int j=0;j<data.getSideDigitNum();j++)
+			{
+				Integer data2 = data.getData(i, j);
+				Position xy=new Position(i,j);
+				boolean newTry = isNewTry(xy,tryedPosition);
+				if(null==data2)
+					sb.append("X");
+				else
+					sb.append(data2);
+				
+				if(j<data.getSideDigitNum()-1)
+					sb.append(",");
+			}
+			sb.append("]");
+			if(i<data.getSideDigitNum()-1)
+				sb.append(",");
+			sb.append("\n");
+		}
+		sb.append("],\n");
+		
+		sb.append("'newTryed':[");
+		if(CollectionUtils.isNotEmpty(tryedPosition))
+		{
+			int tryedSize=tryedPosition.size();
+			for(int i=0;i<tryedSize;i++)
+			{
+				Position p=tryedPosition.get(i);
+				sb.append("[").append(p.getX()).append(",").append(p.getY()).append("]");
+				if(i<tryedSize-1)
+				{
+					sb.append(",");
+				}
+			}
+		}
+		sb.append("]\n");
+		sb.append("}");
+		return sb.toString();
+	}
+	private boolean isNewTry(Position position,List<Position> allPosition)
+	{
+		boolean re=false;
+		if(position!=null && CollectionUtils.isNotEmpty(allPosition))
+		{
+			for(Position p:allPosition)
+			{
+				if(position.getX()==p.getX() && position.getY()==p.getY())
+				{	
+					re=true;
+					break;
+				}
+					
+			}
+		}
+		return re;
 	}
 	private String printJson(Node<Shudu> datas)
 	{
 		Gson gson=new GsonBuilder().setPrettyPrinting().serializeNulls().create();
 		String json = gson.toJson(datas);
 		return json;
-	}
-	/**
-	 * 打印出数独的推导过程
-	 * @param datas
-	 * @return
-	 */
-	private String printInternal(Node<Shudu> datas)
-	{
-		StringBuilder sb=new StringBuilder();
-		datas.setPosition(new Position(0,0));
-		settingNodePosition(datas);
-		Map<Integer, List<Node<Shudu>>> levelNodeMap = getLevelNodeMap(datas);
-		List<Node<Shudu>> deepestLevelNodes = getDeepestLevelNodes(levelNodeMap);
-		
-		
-		return sb.toString();
-	}
-	/**
-	 * 得到树的最深一级的所有节点
-	 * @param levelNodeMap 以层级为key,该层级的所有节点为value的Map
-	 * @return
-	 */
-	private List<Node<Shudu>> getDeepestLevelNodes(Map<Integer, List<Node<Shudu>>> levelNodeMap)
-	{
-		Integer maxLevel=0;
-		for(Map.Entry<Integer,List<Node<Shudu>>> entry:levelNodeMap.entrySet())
-		{
-			Integer key = entry.getKey();
-			if(key>maxLevel)
-				maxLevel=key;
-		}
-		return levelNodeMap.get(maxLevel);
-	}
-	/**
-	 * 设置节点的位置，方便打印。
-	 * 在这里只是表示一个节点是第几行第几列（树的根结点是第0行，第0列）。
-	 * @param datas
-	 */
-	private void settingNodePosition(Node<Shudu> datas)
-	{
-		List<Node<Shudu>> children = datas.getChildren();
-		if(children!=null && !children.isEmpty())
-		{
-			int i=0;
-			for(Node<Shudu> child:datas.getChildren())
-			{
-				Position position = datas.getPosition();
-				child.setPosition(new Position(position.getX()+1,i));
-				settingNodePosition(child);
-				i++;
-			}
-		}
-		
-	}
-	/**
-	 * 得到树的每一级深度和该深度对应的所有节点。
-	 * @param datas
-	 * @return
-	 */
-	private Map<Integer,List<Node<Shudu>>> getLevelNodeMap(Node<Shudu> datas)
-	{
-		Map<Integer,List<Node<Shudu>>> re=new HashMap<Integer,List<Node<Shudu>>>();
-		addNodeToMap(re,datas.getPosition().getX(),datas);
-		List<Node<Shudu>> children = datas.getChildren();
-		if(CollectionUtils.isNotEmpty(children))
-		{
-			for(Node<Shudu> child:children)
-			{
-				Map<Integer, List<Node<Shudu>>> childLevelNodeMap = getLevelNodeMap(child);
-				addNodeToMap(re,childLevelNodeMap);
-			}
-		}
-		
-		return re;
-	}
-	private void addNodeToMap(Map<Integer,List<Node<Shudu>>> map,Integer level,Node<Shudu> node)
-	{
-		List<Node<Shudu>> list = map.get(level);
-		if(list==null)
-		{
-			list=new ArrayList<Node<Shudu>>();
-			map.put(level, list);
-		}
-		list.add(node);
-	}
-	private void addNodeToMap(Map<Integer,List<Node<Shudu>>> mapMain,Map<Integer,List<Node<Shudu>>> mapIncrease)
-	{
-		for(Map.Entry<Integer,List<Node<Shudu>>> entry:mapIncrease.entrySet())
-		{
-			Integer key = entry.getKey();
-			List<Node<Shudu>> list = mapMain.get(key);
-			if(list==null)
-			{
-				list=new ArrayList<Node<Shudu>>();
-				mapMain.put(key, list);
-			}
-			
-			list.addAll(entry.getValue());
-		}
 	}
 }
