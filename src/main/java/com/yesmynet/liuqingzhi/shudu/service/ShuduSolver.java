@@ -24,6 +24,7 @@ public class ShuduSolver {
 	public void solve(Node<Shudu> datas)
 	{
 		solveInternal(datas);
+		shuduPrint.print(datas);
 	}
 	/**
 	 * 计算出数独的解答
@@ -48,7 +49,6 @@ public class ShuduSolver {
 						currentDatas.setChildren(new ArrayList<Node<Shudu>>());
 					}
 					currentDatas.getChildren().addAll(generateChildren);
-					shuduPrint.print(currentDatas);
 					
 					if(generateChildren!=null && !generateChildren.isEmpty())
 					{
@@ -88,7 +88,7 @@ public class ShuduSolver {
 		{
 			for(GroupDigitType type: GroupDigitType.values())
 			{
-				re=data.validGroupDigit(type, i);
+				re=validGroupDigitTry(type, i,childNode.getData());
 				if(re!=null && re.getSuccess()!=null &&re.getSuccess()==false)
 				{
 					//有不符合规则的数据，直接退出
@@ -97,6 +97,47 @@ public class ShuduSolver {
 			}
 			
 		}
+		return re;
+	}
+	/**
+	 * 验证一组数字是否符合规则
+	 * @param groupDigitType
+	 * @param i
+	 * @return null表示这一组数字中有空的,其它情况都会判断是否符合规
+	 */
+	private InfoDto validGroupDigitTry(GroupDigitType groupDigitType,int i,Shudu shudu)
+	{
+		InfoDto re=new InfoDto();
+		List<DigitPosition> groupDigit = shudu.getGroupDigit(groupDigitType,i);
+		int sideDigitNum = shudu.getSideDigitNum();
+		if(groupDigit.size()!=sideDigitNum)
+		{
+			throw new RuntimeException("得到的一组数字不是规定的个数，期望是"+ sideDigitNum +"个数字，但是实际是"+ groupDigit.size() +"个");
+		}
+		/*for(DigitPosition dp:groupDigit)
+		{
+			if(dp.getDigit()==null)
+				return null;
+		}*/
+		for(int ii=1;ii<10;ii++)
+		{
+			List<Position> digIndex=new ArrayList<Position>(); 
+			for(DigitPosition dp:groupDigit)
+			{
+				if(dp.getDigit()!=null && dp.getDigit().equals(ii))
+				{
+					digIndex.add(dp.getPosition());
+				}
+			}
+			if(digIndex.size()>1)
+			{
+				//这是不符合规则了
+				re.setSuccess(false);
+				Position[] array = digIndex.toArray(new Position[0]);
+				re.setMsg(String.format("数字%s出现了%s次，分别是%s",ii,digIndex.size(),Arrays.toString(array)));
+			}
+		}
+		
 		return re;
 	}
 	/**

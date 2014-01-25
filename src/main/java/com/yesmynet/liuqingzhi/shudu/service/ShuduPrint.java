@@ -9,6 +9,7 @@ import org.apache.commons.collections.CollectionUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.yesmynet.liuqingzhi.shudu.dto.InfoDto;
 import com.yesmynet.liuqingzhi.shudu.dto.Node;
 import com.yesmynet.liuqingzhi.shudu.dto.Shudu;
 import com.yesmynet.liuqingzhi.shudu.dto.Shudu.Position;
@@ -31,6 +32,7 @@ public class ShuduPrint {
 		//printInternal=printJson(datas);
 		printInternal=printNodesTree(datas);
 		System.out.println(printInternal);
+		System.out.println("\n\n\n");
 	}
 	/**
 	 * 在html中以树的形式显示结点
@@ -45,7 +47,7 @@ public class ShuduPrint {
 		int childCountI=childCount++;
 		String shuduDataTable = getShuduDataTable(datas);
 		sb.append("{\n");
-		sb.append("'id': 'node").append(childCountI++).append("',\n");
+		sb.append("'id': 'node").append(childCountI).append("',\n");
 		sb.append("'name': 'nodeName").append(childCountI).append("',\n");
 		sb.append("'data': ").append(shuduDataTable);
 		if(hasChild)
@@ -56,9 +58,13 @@ public class ShuduPrint {
 		if(hasChild)
 		{	
 			sb.append("'children': [\n");
-			for(Node child:children)
+			for(int i=0;i<children.size();i++)
 			{
+				Node child=children.get(i);
 				sb.append(printNodesTree(child));
+				if(i<children.size()-1)
+					sb.append(",");
+				sb.append("\n");
 			}
 			sb.append("]\n");
 		}	
@@ -87,9 +93,9 @@ public class ShuduPrint {
 				Position xy=new Position(i,j);
 				boolean newTry = isNewTry(xy,tryedPosition);
 				if(null==data2)
-					sb.append("X");
+					sb.append("''");
 				else
-					sb.append(data2);
+					sb.append("'").append(data2).append("'");
 				
 				if(j<data.getSideDigitNum()-1)
 					sb.append(",");
@@ -115,7 +121,13 @@ public class ShuduPrint {
 				}
 			}
 		}
-		sb.append("]\n");
+		sb.append("],\n");
+		
+		InfoDto result = datas.getResult();
+		String success=(result==null || result.getSuccess()==null)?"":result.getSuccess().toString();
+		String msg=(result==null || result.getMsg()==null)?"":result.getMsg();
+		sb.append("'result':{'success':'").append(success).append("','msg':'").append(msg).append("'}\n");
+		
 		sb.append("}");
 		return sb.toString();
 	}

@@ -199,53 +199,6 @@ public class Shudu {
 		}
 		return re;
 	}
-	/**
-	 * 验证一组数字是否符合规则
-	 * @param groupDigitType
-	 * @param i
-	 * @return null表示这一组数字中有空的,其它情况都会判断是否符合规
-	 */
-	public InfoDto validGroupDigit(GroupDigitType groupDigitType,int i)
-	{
-		InfoDto re=new InfoDto();
-		List<DigitPosition> groupDigit = getGroupDigit(groupDigitType,i);
-		if(groupDigit.size()!=sideDigitNum)
-		{
-			throw new RuntimeException("得到的一组数字不是规定的个数，期望是"+ sideDigitNum +"个数字，但是实际是"+ groupDigit.size() +"个");
-		}
-		for(DigitPosition dp:groupDigit)
-		{
-			if(dp.getDigit()==null)
-				return null;
-		}
-		for(int ii=1;ii<10;ii++)
-		{
-			List<Position> digIndex=new ArrayList<Position>(); 
-			for(DigitPosition dp:groupDigit)
-			{
-				if(dp.getDigit().equals(ii))
-				{
-					digIndex.add(dp.getPosition());
-				}
-			}
-			if(digIndex.size()!=1)
-			{
-				//这是不符合规则了
-				re.setSuccess(false);
-				if(digIndex.size()>1)
-				{
-					Position[] array = digIndex.toArray(new Position[0]);
-					re.setMsg(String.format("数字%s出现了%s次，分别是%s",ii,digIndex.size(),Arrays.toString(array)));
-				}
-				else
-				{
-					re.setMsg(String.format("数字%s未找到",ii));
-				}
-			}
-		}
-		
-		return re;
-	}
 	public Integer getSideLength() {
 		return sideLength;
 	}
