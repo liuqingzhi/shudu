@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.yesmynet.liuqingzhi.shudu.dto.InfoDto;
@@ -21,10 +23,20 @@ import com.yesmynet.liuqingzhi.shudu.dto.Shudu.Position;
 public class ShuduSolver {
 	private Gson gson=new GsonBuilder().setPrettyPrinting().serializeNulls().create();
 	private ShuduPrint shuduPrint=new ShuduPrint();
+	/**
+	 * 用于生成ID的计数器
+	 */
+	private int idCounter=1;
+	private Node<Shudu> datasToPrint=null;
 	public void solve(Node<Shudu> datas)
 	{
+		datasToPrint=datas;
+		if(StringUtils.isBlank(datas.getId()))
+		{
+			datas.setId(getNextId());
+		}
 		solveInternal(datas);
-		shuduPrint.print(datas);
+		//shuduPrint.print(datas);
 	}
 	/**
 	 * 计算出数独的解答
@@ -33,12 +45,12 @@ public class ShuduSolver {
 	private void solveInternal(Node<Shudu> currentDatas)
 	{
 		Shudu data = currentDatas.getData();
+		shuduPrint.print(datasToPrint);
 		if(data.isHasEmpty())
 		{
 			List<ShuduTry> easiestTry2 = getEasiestTry(data);
 			for(ShuduTry easiestTry:easiestTry2)
 			{
-				//ShuduTry easiestTry = getEasiestTry(data);
 				List<Integer> toTryDigits = getToTryDigits(easiestTry,data);
 				if(toTryDigits!=null && !toTryDigits.isEmpty())
 				{
@@ -73,6 +85,17 @@ public class ShuduSolver {
 		{
 			//所有数字都填充完了
 		}
+	}
+	/**
+	 * 得到一个节点的ID
+	 * @return
+	 */
+	private String getNextId()
+	{
+		String re="";
+		re+=""+idCounter++;
+		
+		return re;
 	}
 	/**
 	 * 验证一次尝试是否符合规则
@@ -154,8 +177,10 @@ public class ShuduSolver {
 		{
 			Node<Shudu> child=new Node<Shudu>();
 			Shudu cloneShudu = cloneShudu(currentDatas.getData());
+			child.setId(getNextId());
 			child.setData(cloneShudu);
 			child.setParent(currentDatas);
+			
 			
 			if(dataArray.size()!=emptyDigitPosition.size())
 				throw new RuntimeException("排列组合产生的数字个数("+ dataArray.size() +")和要填充的数字的位置个数("+ emptyDigitPosition.size() +")不一样多");

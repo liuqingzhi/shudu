@@ -5,10 +5,20 @@ import java.util.List;
 import com.yesmynet.liuqingzhi.shudu.dto.Shudu.Position;
 
 public class Node<T> {
+	/**
+	 * 主键
+	 */
+	private String id;
 	private T data;
 	private Node<T> parent;
 	private List<Node<T>> children;
 	private InfoDto result;
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
 	public T getData() {
 		return data;
 	}

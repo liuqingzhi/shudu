@@ -47,8 +47,9 @@ public class ShuduPrint {
 		int childCountI=childCount++;
 		String shuduDataTable = getShuduDataTable(datas);
 		sb.append("{\n");
-		sb.append("'id': 'node").append(childCountI).append("',\n");
-		sb.append("'name': 'nodeName").append(childCountI).append("',\n");
+		sb.append("'printCounter': '").append(childCountI).append("',\n");		
+		sb.append("'id': 'node").append(datas.getId()).append("',\n");
+		sb.append("'name': 'nodeName").append(datas.getId()).append("',\n");
 		sb.append("'data': ").append(shuduDataTable);
 		if(hasChild)
 		{	
@@ -90,8 +91,6 @@ public class ShuduPrint {
 			for(int j=0;j<data.getSideDigitNum();j++)
 			{
 				Integer data2 = data.getData(i, j);
-				Position xy=new Position(i,j);
-				boolean newTry = isNewTry(xy,tryedPosition);
 				if(null==data2)
 					sb.append("''");
 				else
@@ -130,23 +129,6 @@ public class ShuduPrint {
 		
 		sb.append("}");
 		return sb.toString();
-	}
-	private boolean isNewTry(Position position,List<Position> allPosition)
-	{
-		boolean re=false;
-		if(position!=null && CollectionUtils.isNotEmpty(allPosition))
-		{
-			for(Position p:allPosition)
-			{
-				if(position.getX()==p.getX() && position.getY()==p.getY())
-				{	
-					re=true;
-					break;
-				}
-					
-			}
-		}
-		return re;
 	}
 	private String printJson(Node<Shudu> datas)
 	{
