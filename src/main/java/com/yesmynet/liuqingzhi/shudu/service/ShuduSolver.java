@@ -112,12 +112,12 @@ public class ShuduSolver {
 		{
 			for(GroupDigitType type: GroupDigitType.values())
 			{
-				re=validGroupDigitTry(type, i,childNode.getData());
-				allResult.add(re);
-				if(re!=null && re.getSuccess()!=null &&re.getSuccess()==false)
+				InfoDto validGroupDigitTry = validGroupDigitTry(type, i,childNode.getData());
+				allResult.add(validGroupDigitTry);
+				if(validGroupDigitTry!=null && validGroupDigitTry.getSuccess()!=null &&validGroupDigitTry.getSuccess()==false)
 				{
 					//有不符合规则的数据，直接退出
-					return re;
+					return validGroupDigitTry;
 				}
 			}
 			
