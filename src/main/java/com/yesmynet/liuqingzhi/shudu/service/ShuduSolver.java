@@ -67,10 +67,10 @@ public class ShuduSolver {
 						for(Node<Shudu> childNode:generateChildren)
 						{
 							InfoDto validNewTry = validNewTry(childNode,easiestTry);
+							childNode.setResult(validNewTry);
 							if(validNewTry!=null && validNewTry.getSuccess()!=null && validNewTry.getSuccess()==false)
 							{
-								//这一次尝试违反了规则
-								childNode.setResult(validNewTry);
+								//这一次尝试违反了规则不用再尝试了
 							}
 							else
 							{
@@ -107,11 +107,13 @@ public class ShuduSolver {
 	{
 		InfoDto re=new InfoDto();
 		Shudu data = childNode.getData();
+		List<InfoDto> allResult=new ArrayList<InfoDto>();
 		for (int i=0;i<data.getSideDigitNum();i++)
 		{
 			for(GroupDigitType type: GroupDigitType.values())
 			{
 				re=validGroupDigitTry(type, i,childNode.getData());
+				allResult.add(re);
 				if(re!=null && re.getSuccess()!=null &&re.getSuccess()==false)
 				{
 					//有不符合规则的数据，直接退出
@@ -120,17 +122,33 @@ public class ShuduSolver {
 			}
 			
 		}
+		boolean hasEmpty=false;
+		for(InfoDto infoDto:allResult)
+		{
+			if(infoDto.getSuccess()==null)
+			{
+				hasEmpty=true;
+				break;
+			}
+		}
+		if(!hasEmpty)
+		{
+			re.setSuccess(true);
+			re.setMsg("正确");
+		}
 		return re;
 	}
 	/**
 	 * 验证一组数字是否符合规则
 	 * @param groupDigitType
 	 * @param i
-	 * @return null表示这一组数字中有空的,其它情况都会判断是否符合规
+	 * @return 返回的InfoDto对象中的success属性表示这一组数字是否符合规：null表示有空数字，true表示都填完了并且符合规则，
+	 * false表示都填完了但是违反了规则
 	 */
 	private InfoDto validGroupDigitTry(GroupDigitType groupDigitType,int i,Shudu shudu)
 	{
 		InfoDto re=new InfoDto();
+		
 		List<DigitPosition> groupDigit = shudu.getGroupDigit(groupDigitType,i);
 		int sideDigitNum = shudu.getSideDigitNum();
 		if(groupDigit.size()!=sideDigitNum)
@@ -161,6 +179,26 @@ public class ShuduSolver {
 			}
 		}
 		
+		if(re.getSuccess()==null)
+		{
+			//说明到目前为止没有违反规则
+			boolean hasEmpty=false;
+			for(DigitPosition dp:groupDigit)
+			{
+				if(dp.getDigit()==null)
+				{
+					hasEmpty=true;
+					break;
+				}
+			}
+			
+			if(!hasEmpty)
+			{
+				//所有数字都填完了，并且没有重复数字，说明这一组数字是对的。
+				re.setSuccess(true);
+				re.setMsg("正确");
+			}
+		}
 		return re;
 	}
 	/**
