@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import com.google.gson.Gson;
@@ -52,7 +53,7 @@ public class ShuduSolver {
 			for(ShuduTry easiestTry:easiestTry2)
 			{
 				List<Integer> toTryDigits = getToTryDigits(easiestTry,data);
-				if(toTryDigits!=null && !toTryDigits.isEmpty())
+				if(CollectionUtils.isNotEmpty(toTryDigits))
 				{
 					List<List<Integer>> combinations = combinations(toTryDigits);
 					List<Node<Shudu>> generateChildren = generateChildren(combinations,easiestTry,currentDatas);
@@ -62,18 +63,15 @@ public class ShuduSolver {
 					}
 					currentDatas.getChildren().addAll(generateChildren);
 					
-					if(generateChildren!=null && !generateChildren.isEmpty())
+					if(CollectionUtils.isNotEmpty(generateChildren))
 					{
 						for(Node<Shudu> childNode:generateChildren)
 						{
 							InfoDto validNewTry = validNewTry(childNode,easiestTry);
 							childNode.setResult(validNewTry);
-							if(validNewTry!=null && validNewTry.getSuccess()!=null && validNewTry.getSuccess()==false)
+							if(validNewTry.getSuccess()==null)
 							{
-								//这一次尝试违反了规则不用再尝试了
-							}
-							else
-							{
+								//这一次尝试还有空的，并且，到目前为止没有违反规则
 								solveInternal(childNode);
 							}
 						}
