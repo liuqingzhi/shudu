@@ -25,14 +25,13 @@ public class ShuduPrint {
 	 * 打印
 	 * @param datas
 	 */
-	public void print(Node<Shudu> datas)
+	public String print(Node<Shudu> datas)
 	{
 		String printInternal = "";
 		//printInternal=printInternal(datas);
 		//printInternal=printJson(datas);
 		printInternal=printNodesTree(datas);
-		System.out.println(printInternal);
-		System.out.println("\n\n\n");
+		return printInternal;
 	}
 	/**
 	 * 在html中以树的形式显示结点

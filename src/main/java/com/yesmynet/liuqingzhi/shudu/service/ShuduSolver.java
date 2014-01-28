@@ -11,6 +11,8 @@ import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -22,6 +24,7 @@ import com.yesmynet.liuqingzhi.shudu.dto.Shudu.GroupDigitType;
 import com.yesmynet.liuqingzhi.shudu.dto.Shudu.Position;
 
 public class ShuduSolver {
+	private Logger logger =LoggerFactory.getLogger(getClass());
 	private Gson gson=new GsonBuilder().setPrettyPrinting().serializeNulls().create();
 	private ShuduPrint shuduPrint=new ShuduPrint();
 	/**
@@ -46,7 +49,7 @@ public class ShuduSolver {
 	private void solveInternal(Node<Shudu> currentDatas)
 	{
 		Shudu data = currentDatas.getData();
-		shuduPrint.print(datasToPrint);
+		logger.debug("尝试的次数={},currentDatas.id={},print={}",idCounter,currentDatas.getId(),shuduPrint.print(datasToPrint));
 		if(data.isHasEmpty())
 		{
 			List<ShuduTry> easiestTry2 = getEasiestTry(data);
