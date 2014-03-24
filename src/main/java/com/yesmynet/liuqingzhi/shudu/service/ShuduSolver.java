@@ -40,7 +40,7 @@ public class ShuduSolver {
 			datas.setId(getNextId());
 		}
 		solveInternal(datas);
-		//shuduPrint.print(datas);
+		logger.debug("最后遍历了所有路径后的结果={}",shuduPrint.print(datas));
 	}
 	/**
 	 * 计算出数独的解答
@@ -49,7 +49,7 @@ public class ShuduSolver {
 	private void solveInternal(Node<Shudu> currentDatas)
 	{
 		Shudu data = currentDatas.getData();
-		logger.debug("尝试的次数={},currentDatas.id={},print={}",idCounter,currentDatas.getId(),shuduPrint.print(datasToPrint));
+		logger.debug("尝试的次数={},currentDatas.id={},print={}",idCounter,currentDatas.getId());//shuduPrint.print(datasToPrint));
 		if(data.isHasEmpty())
 		{
 			List<ShuduTry> easiestTry2 = getEasiestTry(data);
