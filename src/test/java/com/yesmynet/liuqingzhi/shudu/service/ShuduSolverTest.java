@@ -2,6 +2,7 @@ package com.yesmynet.liuqingzhi.shudu.service;
 
 import static org.junit.Assert.*;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -47,6 +48,29 @@ public class ShuduSolverTest {
 		combinations = shuduSolver.combinations(Arrays.asList(1,2,3,4));
 		printCombinations(combinations);
 		
+	}
+	@Test
+	public void testCount1()
+	{
+		BigDecimal bigDecimal = new BigDecimal(81);
+		BigDecimal factorial = factorial(bigDecimal);
+		
+		System.out.printf("阶乘结果=%s\n",factorial);
+	}
+	private BigDecimal factorial(BigDecimal num)
+	{
+		BigDecimal re=num;
+		
+		if(re.intValue()==1)
+		{
+			re = new BigDecimal(1);
+		}
+		else
+		{
+			re=re.multiply(factorial(num.subtract(new BigDecimal(1))));
+		}
+		
+		return re;
 	}
 	private void printCombinations(List<List<Integer>> combinations)
 	{
